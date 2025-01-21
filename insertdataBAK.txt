@@ -1,0 +1,73 @@
+# Fungsi untuk inisialisasi database
+def init_db():
+    db_base_config = {key: db_config[key] for key in db_config if key != 'database'}
+    database_name = db_config['database']
+
+    try:
+        conn = mysql.connector.connect(**db_base_config)
+        cursor = conn.cursor()
+
+        # Buat database jika belum ada
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {database_name}")
+        cursor.execute(f"USE {database_name}")
+
+        # Buat tabel users
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(50) UNIQUE NOT NULL,
+            email VARCHAR(100) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+
+        # Buat tabel merchandise
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS merchandise (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100) NOT NULL,
+            stock INT NOT NULL,
+            price DECIMAL(10, 2) NOT NULL,
+            whatsapp_link VARCHAR(255) NOT NULL,
+            image_url VARCHAR(255),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+
+        # Isi data awal ke tabel merchandise jika kosong
+        cursor.execute("SELECT COUNT(*) FROM merchandise")
+        if cursor.fetchone()[0] == 0:
+            cursor.executemany("""
+            INSERT INTO merchandise (name, stock, price, whatsapp_link, image_url) VALUES 
+            (%s, %s, %s, %s, %s)
+            """, [
+                ('T-Shirt Anime Jomok', 50, 120000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20T-Shirt%20Anime', '/static/images/kaosjomok.jpg'),
+                ('Hoodie Gaming', 70, 300000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Hoodie%20Gaming', '/static/images/hoodieanime.jpg'),
+                ('Action Figure', 30, 500000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/figure.jpg'),
+                ('Kipas Jepang', 80, 10000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/kipas.jpeg'),
+                ('Headset Anime', 20, 200000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/headset.jpeg'),
+                ('Kuping Kucing', 40, 500000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/kupingkucing.jpeg'),
+                ('Deskmate', 40, 40000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/deskmate.jpeg'),
+                ('Kacamata', 40, 50000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/kacamata.jpeg'),
+                ('Topeng', 20, 250000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/topeng.jpg'),
+                ('Pita', 20, 9000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/pita.jpeg'),
+                ('Keychain', 40, 25000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/keychain.jpg'),
+                ('Parfum', 40, 90000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/parfum.jpg'),
+                ('Kaos Kaki', 40, 30000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/kaoskaki.jpg'),
+                ('Topi', 40, 70000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/topi.jpg'),
+                ('Poster', 90, 10000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/poster.jpeg'),
+                ('Card TCG', 100, 50000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/card.jpeg'),
+                ('Lanyard', 40, 50000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/lanyard.jpeg'),
+                ('Gacha', 100, 10000, 'https://wa.me/6281234567890?text=Saya%20tertarik%20dengan%20Action%20Figure', '/static/images/gacha.jpeg'),
+                
+
+            ])
+            print("Data awal merchandise telah ditambahkan.")
+
+        conn.commit()
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+        conn.close()
