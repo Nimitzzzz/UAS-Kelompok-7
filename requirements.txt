@@ -79,3 +79,4 @@ wheel==0.43.0
 wsproto==1.2.0
 xyzservices==2024.9.0
 vboxapi
+gunicorn
