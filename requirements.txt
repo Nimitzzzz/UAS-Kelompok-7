@@ -72,7 +72,7 @@ typing_extensions==4.12.2
 tzdata==2024.1
 ua-parser==0.18.0
 urllib3==2.2.1
-vboxapi==1.0
+vboxapi
 watchdog==4.0.1
 websocket-client
 Werkzeug==3.1.3
